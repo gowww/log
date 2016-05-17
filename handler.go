@@ -53,8 +53,11 @@ type logWriter struct {
 
 // WriteHeader catches a downstream WriteHeader call and gets the status code.
 func (lw *logWriter) WriteHeader(status int) {
-	lw.status = status
+	if lw.used {
+		return
+	}
 	lw.used = true
+	lw.status = status
 	lw.ResponseWriter.WriteHeader(status)
 }
 
