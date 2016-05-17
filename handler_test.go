@@ -19,6 +19,7 @@ func TestLog(t *testing.T) {
 		for _, status := range statuses {
 			ts := httptest.NewServer(HandleFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(status)
+				w.WriteHeader(status + 1)
 				w.Write(nil)
 			}))
 			defer ts.Close()
