@@ -6,25 +6,45 @@ Make sure to include this handler above any other handler to get accurate logs.
 package log
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
 )
 
+// The list of used standard Unix terminal color codes.
+const (
+	cReset    = "\033[0m"
+	cDim      = "\033[2m"
+	cRed      = "\033[31m"
+	cGreen    = "\033[32m"
+	cBlue     = "\033[34m"
+	cCyan     = "\033[36m"
+	cWhite    = "\033[97m"
+	cBgRed    = "\033[41m"
+	cBgGreen  = "\033[42m"
+	cBgYellow = "\033[43m"
+	cBgCyan   = "\033[46m"
+)
+
 // An Handler provides a clever gzip compressing handler.
 type Handler struct {
-	Next http.Handler
+	Options *Options
+	Next    http.Handler
+}
+
+// Options contains the handler options.
+type Options struct {
+	Color bool
 }
 
 // Handle returns a Handler wrapping another http.Handler.
-func Handle(h http.Handler) *Handler {
-	return &Handler{h}
+func Handle(o *Options, h http.Handler) *Handler {
+	return &Handler{o, h}
 }
 
 // HandleFunc returns a Handler wrapping an http.HandlerFunc.
-func HandleFunc(f http.HandlerFunc) *Handler {
-	return Handle(f)
+func HandleFunc(o *Options, f http.HandlerFunc) *Handler {
+	return Handle(o, f)
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +58,36 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
 	defer func() {
-		log.Printf("  %s   %s   %s  %s", fmtDuration(start), fmtStatus(lw.status), fmtMethod(method), fmtPath(path))
+		if h.Options == nil || !h.Options.Color {
+			log.Printf("%s %s ▶︎ %d @ %s", method, path, lw.status, time.Since(start))
+			return
+		}
+
+		var cBgStatus string
+		switch {
+		case lw.status >= 200 && lw.status <= 299:
+			cBgStatus += cBgGreen
+		case lw.status >= 300 && lw.status <= 399:
+			cBgStatus += cBgCyan
+		case lw.status >= 400 && lw.status <= 499:
+			cBgStatus += cBgYellow
+		default:
+			cBgStatus += cBgRed
+		}
+
+		var cMethod string
+		switch method {
+		case "GET":
+			cMethod += cGreen
+		case "POST":
+			cMethod += cCyan
+		case "PUT", "PATCH":
+			cMethod += cBlue
+		case "DELETE":
+			cMethod += cRed
+		}
+
+		log.Printf("%s  %s%13s%s   %s%s %3d %s   %s%s%s  %s%s%s", cReset, cDim, time.Since(start), cReset, cWhite, cBgStatus, lw.status, cReset, cMethod, method, cReset, cDim, path, cReset)
 	}()
 
 	h.Next.ServeHTTP(lw, r)
@@ -65,46 +114,4 @@ func (lw *logWriter) WriteHeader(status int) {
 func (lw *logWriter) Write(b []byte) (int, error) {
 	lw.used = true
 	return lw.ResponseWriter.Write(b)
-}
-
-func fmtDuration(start time.Time) string {
-	return fmt.Sprintf("%s%s%13s%s", colorResetAll, colorDim, time.Since(start), colorResetAll)
-}
-
-func fmtStatus(status int) string {
-	color := colorWhite
-
-	switch {
-	case status >= 200 && status <= 299:
-		color += colorBackgroundGreen
-	case status >= 300 && status <= 399:
-		color += colorBackgroundCyan
-	case status >= 400 && status <= 499:
-		color += colorBackgroundYellow
-	default:
-		color += colorBackgroundRed
-	}
-
-	return fmt.Sprintf("%s%s %3d %s", colorResetAll, color, status, colorResetAll)
-}
-
-func fmtMethod(method string) string {
-	var color string
-
-	switch method {
-	case "GET":
-		color += colorGreen
-	case "POST":
-		color += colorCyan
-	case "PUT", "PATCH":
-		color += colorBlue
-	case "DELETE":
-		color += colorRed
-	}
-
-	return fmt.Sprintf("%s%s%s%s", colorResetAll, color, method, colorResetAll)
-}
-
-func fmtPath(path string) string {
-	return fmt.Sprintf("%s%s%s%s", colorResetAll, colorDim, path, colorResetAll)
 }

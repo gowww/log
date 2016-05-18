@@ -14,7 +14,7 @@ func Example() {
 		fmt.Fprint(w, "Request/response will be logged.")
 	})
 
-	http.ListenAndServe(":8080", log.Handle(mux))
+	http.ListenAndServe(":8080", log.Handle(&log.Options{Color: true}, mux))
 }
 
 func ExampleHandle() {
@@ -24,11 +24,11 @@ func ExampleHandle() {
 		fmt.Fprint(w, "Request/response will be logged.")
 	})
 
-	http.ListenAndServe(":8080", log.Handle(mux))
+	http.ListenAndServe(":8080", log.Handle(&log.Options{Color: true}, mux))
 }
 
 func ExampleHandleFunc() {
-	http.Handle("/", log.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.Handle("/", log.HandleFunc(&log.Options{Color: true}, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Request/response will be logged.")
 	}))
 
