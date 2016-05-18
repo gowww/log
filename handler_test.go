@@ -12,10 +12,7 @@ type testableContent struct {
 }
 
 func TestLog(t *testing.T) {
-	options := []*Options{
-		&Options{Color: false},
-		&Options{Color: true},
-	}
+	options := []*Options{{Color: false}, {Color: true}}
 	methods := []string{"GET", "POST", "PUT", "PATCH", "DELETE"}
 	statuses := []int{200, 300, 400, 500}
 
