@@ -1,5 +1,6 @@
 /*
 Package log provides a handler that logs each request/response (time, duration, status, method, path).
+The log formatting can either be couloured or not.
 
 Make sure to include this handler above any other handler to get accurate logs.
 */
@@ -11,7 +12,7 @@ import (
 	"time"
 )
 
-// The list of used standard Unix terminal color codes.
+// The list of Unix terminal color codes used for coloured formatting.
 const (
 	cReset    = "\033[0m"
 	cDim      = "\033[2m"
@@ -26,15 +27,15 @@ const (
 	cBgCyan   = "\033[46m"
 )
 
-// An Handler provides a clever gzip compressing handler.
+// A Handler provides a clever gzip compressing handler.
 type Handler struct {
 	Options *Options
 	Next    http.Handler
 }
 
-// Options contains the handler options.
+// Options provides the handler options.
 type Options struct {
-	Color bool
+	Color bool // Colors triggers a coloured formatting compatible with Unix-based terminals.
 }
 
 // Handle returns a Handler wrapping another http.Handler.
@@ -93,14 +94,14 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.Next.ServeHTTP(lw, r)
 }
 
-// logWriter catches the downstream repsonse writing to get the status code.
+// logWriter catches the status code from the downstream repsonse writing.
 type logWriter struct {
 	http.ResponseWriter
 	used   bool
 	status int
 }
 
-// WriteHeader catches a downstream WriteHeader call and gets the status code.
+// WriteHeader catches and seals the status code from the downstream WriteHeader call.
 func (lw *logWriter) WriteHeader(status int) {
 	if lw.used {
 		return
@@ -110,7 +111,7 @@ func (lw *logWriter) WriteHeader(status int) {
 	lw.ResponseWriter.WriteHeader(status)
 }
 
-// Write catches a downstream Write call and seals the status code.
+// Write catches the downstream Write call to seal the status code.
 func (lw *logWriter) Write(b []byte) (int, error) {
 	lw.used = true
 	return lw.ResponseWriter.Write(b)
