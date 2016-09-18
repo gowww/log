@@ -6,11 +6,6 @@ import (
 	"testing"
 )
 
-type testableContent struct {
-	needsGzip bool
-	body      []byte
-}
-
 func TestLog(t *testing.T) {
 	options := []*Options{{Color: false}, {Color: true}}
 	methods := []string{"GET", "POST", "PUT", "PATCH", "DELETE"}
