@@ -14,11 +14,11 @@ func TestLog(t *testing.T) {
 	for _, option := range options {
 		for _, method := range methods {
 			for _, status := range statuses {
-				ts := httptest.NewServer(HandleFunc(option, func(w http.ResponseWriter, r *http.Request) {
+				ts := httptest.NewServer(HandleFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(status)
 					w.WriteHeader(status + 1)
 					w.Write(nil)
-				}))
+				}, option))
 				defer ts.Close()
 
 				req, err := http.NewRequest(method, ts.URL, nil)

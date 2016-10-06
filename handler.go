@@ -39,13 +39,13 @@ type Options struct {
 }
 
 // Handle returns a Handler wrapping another http.Handler.
-func Handle(o *Options, h http.Handler) *Handler {
+func Handle(h http.Handler, o *Options) *Handler {
 	return &Handler{o, h}
 }
 
 // HandleFunc returns a Handler wrapping an http.HandlerFunc.
-func HandleFunc(o *Options, f http.HandlerFunc) *Handler {
-	return Handle(o, f)
+func HandleFunc(f http.HandlerFunc, o *Options) *Handler {
+	return Handle(f, o)
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
