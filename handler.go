@@ -27,10 +27,10 @@ const (
 	cBgCyan   = "\033[46m"
 )
 
-// A Handler provides a clever gzip compressing handler.
-type Handler struct {
-	Options *Options
-	Next    http.Handler
+// A handler provides a clever gzip compressing handler.
+type handler struct {
+	options *Options
+	next    http.Handler
 }
 
 // Options provides the handler options.
@@ -39,16 +39,16 @@ type Options struct {
 }
 
 // Handle returns a Handler wrapping another http.Handler.
-func Handle(h http.Handler, o *Options) *Handler {
-	return &Handler{o, h}
+func Handle(h http.Handler, o *Options) http.Handler {
+	return &handler{o, h}
 }
 
 // HandleFunc returns a Handler wrapping an http.HandlerFunc.
-func HandleFunc(f http.HandlerFunc, o *Options) *Handler {
+func HandleFunc(f http.HandlerFunc, o *Options) http.Handler {
 	return Handle(f, o)
 }
 
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	lw := &logWriter{
 		ResponseWriter: w,
@@ -59,7 +59,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
 	defer func() {
-		if h.Options == nil || !h.Options.Color {
+		if h.options == nil || !h.options.Color {
 			log.Printf("%s %s ▶︎ %d @ %s", method, path, lw.status, time.Since(start))
 			return
 		}
@@ -91,7 +91,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s  %s%13s%s   %s%s %3d %s   %s%s%s  %s%s%s", cReset, cDim, time.Since(start), cReset, cWhite, cBgStatus, lw.status, cReset, cMethod, method, cReset, cDim, path, cReset)
 	}()
 
-	h.Next.ServeHTTP(lw, r)
+	h.next.ServeHTTP(lw, r)
 }
 
 // logWriter catches the status code from the downstream repsonse writing.
