@@ -94,7 +94,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.next.ServeHTTP(lw, r)
 }
 
-// logWriter catches the status code from the downstream repsonse writing.
+// logWriter catches the status code from the downstream response writing.
 type logWriter struct {
 	http.ResponseWriter
 	used   bool
