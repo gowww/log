@@ -12,7 +12,6 @@ import (
 	"time"
 )
 
-// The list of Unix terminal color codes used for coloured formatting.
 const (
 	cReset    = "\033[0m"
 	cDim      = "\033[2m"
@@ -52,13 +51,16 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	lw := &logWriter{
 		ResponseWriter: w,
-		status:         http.StatusOK,
 	}
 	// Keep originals in case the response will be altered.
 	method := r.Method
 	path := r.URL.Path
 
 	defer func() {
+		if lw.status == 0 {
+			lw.status = http.StatusOK
+		}
+
 		if h.options == nil || !h.options.Color {
 			log.Printf("%s %s ▶︎ %d @ %s", method, path, lw.status, time.Since(start))
 			return
@@ -94,25 +96,15 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.next.ServeHTTP(lw, r)
 }
 
-// logWriter catches the status code from the downstream response writing.
+// logWriter catches the status code from WriteHeader.
 type logWriter struct {
 	http.ResponseWriter
-	used   bool
 	status int
 }
 
-// WriteHeader catches and seals the status code from the downstream WriteHeader call.
 func (lw *logWriter) WriteHeader(status int) {
-	if lw.used {
-		return
+	if lw.status == 0 {
+		lw.status = status
 	}
-	lw.used = true
-	lw.status = status
 	lw.ResponseWriter.WriteHeader(status)
-}
-
-// Write catches the downstream Write call to seal the status code.
-func (lw *logWriter) Write(b []byte) (int, error) {
-	lw.used = true
-	return lw.ResponseWriter.Write(b)
 }
