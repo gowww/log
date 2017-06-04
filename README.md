@@ -11,7 +11,7 @@ Make sure to include this handler above any other handler to get accurate logs.
 mux := http.NewServeMux()
 
 mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprint(w, "Request/response will be logged.")
+	fmt.Fprint(w, "Request/response will be logged.")
 })
 
 http.ListenAndServe(":8080", log.Handle(mux, &log.Options{Color: true}))
