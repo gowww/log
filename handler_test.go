@@ -7,26 +7,27 @@ import (
 )
 
 func TestLog(t *testing.T) {
-	options := []*Options{{Color: false}, {Color: true}}
+	options := []*Options{nil, {Color: true}}
 	methods := []string{"GET", "POST", "PUT", "PATCH", "DELETE"}
 	statuses := []int{200, 300, 400, 500}
 
 	for _, option := range options {
 		for _, method := range methods {
 			for _, status := range statuses {
-				ts := httptest.NewServer(HandleFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.WriteHeader(status)
-					w.Write(nil)
-				}, option))
-				defer ts.Close()
+				h := HandleFunc(func(w http.ResponseWriter, r *http.Request) {
+					if status != 200 {
+						w.WriteHeader(status)
+					}
+				}, option)
+				req := httptest.NewRequest(method, "/", nil)
+				w := httptest.NewRecorder()
+				h.ServeHTTP(w, req)
 
-				req, err := http.NewRequest(method, ts.URL, nil)
-				if err != nil {
-					t.Fatal(err)
+				if w.Code != status {
+					t.Errorf("status code: want %v, got %v", status, w.Code)
 				}
-
-				if _, err := http.DefaultClient.Do(req); err != nil {
-					t.Fatal(err)
+				if w.Body.String() != "" {
+					t.Errorf("body: want empty, got %q", w.Body.String())
 				}
 			}
 		}
