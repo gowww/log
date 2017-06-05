@@ -26,7 +26,7 @@ const (
 	cBgCyan   = "\033[46m"
 )
 
-// A handler provides a clever gzip compressing handler.
+// A handler provides a request/response logging handler.
 type handler struct {
 	options *Options
 	next    http.Handler
