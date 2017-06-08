@@ -3,8 +3,6 @@
 Package [log](https://godoc.org/github.com/gowww/log) provides a handlers that logs each request/response (time, duration, status, method, path).
 The log formatting can either be couloured or not.
 
-Make sure to include this handler above any other handler to get accurate logs.
-
 ## Usage
 
 To wrap an [http.Handler](https://golang.org/pkg/net/http/#Handler), use [Handle](https://godoc.org/github.com/gowww/log#Handle):
@@ -28,6 +26,8 @@ http.Handle("/", log.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
 
 http.ListenAndServe(":8080", nil)
 ```
+
+All in all, make sure to include this handler above any other handler to get accurate performance logs.
 
 ### Colorized output
 
