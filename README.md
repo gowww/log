@@ -5,14 +5,42 @@ The log formatting can either be couloured or not.
 
 Make sure to include this handler above any other handler to get accurate logs.
 
-## Example
+## Usage
+
+To wrap an [http.Handler](https://golang.org/pkg/net/http/#Handler), use [Handle](https://godoc.org/github.com/gowww/log#Handle):
 
 ```Go
 mux := http.NewServeMux()
 
 mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Request/response will be logged.")
+	fmt.Fprint(w, "Hello")
 })
 
-http.ListenAndServe(":8080", log.Handle(mux, &log.Options{Color: true}))
+http.ListenAndServe(":8080", log.Handle(mux, nil))
+````
+
+To wrap an [http.HandlerFunc](https://golang.org/pkg/net/http/#HandlerFunc), use [HandleFunc](https://godoc.org/github.com/gowww/log#HandleFunc):
+
+```Go
+http.Handle("/", log.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hello")
+}, nil))
+
+http.ListenAndServe(":8080", nil)
+```
+
+### Colorized output
+
+If you are on a Unix-based OS and you can set a colorized output:
+
+```Go
+mux := http.NewServeMux()
+
+mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hello")
+})
+
+http.ListenAndServe(":8080", log.Handle(mux, &log.Options{
+	Color: true,
+}))
 ```
