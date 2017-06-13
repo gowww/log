@@ -1,8 +1,9 @@
 /*
 Package log provides a handler that logs each request/response (time, duration, status, method, path).
+
 The log formatting can either be couloured or not.
 
-Make sure to include this handler above any other handler to get accurate logs.
+Make sure to include this handler above any other handler to get accurate performance logs.
 */
 package log
 
