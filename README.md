@@ -3,6 +3,19 @@
 Package [log](https://godoc.org/github.com/gowww/log) provides a handlers that logs each request/response (time, duration, status, method, path).  
 The log formatting can either be couloured or not.
 
+## Installing
+
+1. Get package:
+
+	```Shell
+	go get -u github.com/gowww/log
+	````
+
+2. Import it in your code:
+
+	```Go
+	import "github.com/gowww/log"
+
 ## Usage
 
 To wrap an [http.Handler](https://golang.org/pkg/net/http/#Handler), use [Handle](https://godoc.org/github.com/gowww/log#Handle):
