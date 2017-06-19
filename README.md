@@ -15,6 +15,7 @@ The log formatting can either be couloured or not.
 
 	```Go
 	import "github.com/gowww/log"
+	```
 
 ## Usage
 
