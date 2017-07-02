@@ -9,7 +9,7 @@ The log formatting can either be couloured or not.
 
 	```Shell
 	go get -u github.com/gowww/log
-	````
+	```
 
 2. Import it in your code:
 
@@ -29,7 +29,7 @@ mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 })
 
 http.ListenAndServe(":8080", log.Handle(mux, nil))
-````
+```
 
 To wrap an [http.HandlerFunc](https://golang.org/pkg/net/http/#HandlerFunc), use [HandleFunc](https://godoc.org/github.com/gowww/log#HandleFunc):
 
