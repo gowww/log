@@ -57,4 +57,4 @@ log.Handle(handler, &log.Options{
 
 ### Colorized
 
-![gowww-log-color](https://user-images.githubusercontent.com/9503891/27188839-c06d7b0e-51ef-11e7-80a6-afceaab23838.png)
+![gowww-log-color](https://gist.githubusercontent.com/arthurwhite/0956f6a409162f6fd11bd5631f3a6537/raw/18d2567c6ba031f97748ff77a6f51a454d9398e8/log-color.svg)
